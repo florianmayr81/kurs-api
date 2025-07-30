@@ -73,7 +73,6 @@ paths:
                   net_margin:
                     type: number
 
-  paths:
   /analyze:
     get:
       operationId: analyzeStock
