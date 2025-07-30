@@ -4,25 +4,28 @@ import requests
 app = FastAPI()
 
 API_KEY = "6h6GDJbniaGPJ1X0zZPeFQXQaMWhojyu"
+HEADERS = {"User-Agent": "Mozilla/5.0"}  # WICHTIG für Render!
 
-def get_fx_rate(to_currency="EUR"):
-        fx_url = f"https://financialmodelingprep.com/stable/quote-short?symbol=EURUSD&apikey={API_KEY}"
+def get_fx_rate():
+    fx_url = f"https://financialmodelingprep.com/stable/quote-short?symbol=EURUSD&apikey={API_KEY}"
     try:
-        resp = requests.get(fx_url)
+        resp = requests.get(fx_url, headers=HEADERS)
         data = resp.json()
         return data[0]["price"]
-    except:
+    except Exception as e:
+        print("FX-Fehler:", str(e))
         return 1.0
+
 
 @app.get("/price")
 def get_price(symbol: str, currency: str = "EUR"):
     try:
         url = f"https://financialmodelingprep.com/api/v3/quote/{symbol.upper()},EURUSD?apikey={API_KEY}"
-        response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
+        response = requests.get(url, headers=HEADERS)
         data = response.json()
 
         if not data or len(data) < 2:
-            return {"error": "Kursdaten unvollständig."}
+            return {"error": "Kursdaten unvollständig.", "response": data}
 
         stock_data = next((d for d in data if d["symbol"] == symbol.upper()), None)
         fx_data = next((d for d in data if d["symbol"] == "EURUSD"), None)
@@ -40,44 +43,3 @@ def get_price(symbol: str, currency: str = "EUR"):
             "price": price,
             "currency": currency.upper(),
             "converted_from": "USD",
-            "exchange_rate_used": fx_rate
-        }
-
-    except Exception as e:
-        return {"error": str(e)}
-
-
-        
-@app.get("/fundamentals")
-def get_fundamentals(symbol: str, year: int):
-    try:
-        url = f"https://financialmodelingprep.com/api/v3/income-statement/{symbol.upper()}?limit=3&apikey=6h6GDJbniaGPJ1X0zZPeFQXQaMWhojyu"
-        resp = requests.get(url)
-        data = resp.json()
-
-        # Suche nach dem gewünschten Jahr
-        match = next((item for item in data if str(year) in item["date"]), None)
-        if not match:
-            return {"error": f"Kein Bericht für {symbol} im Jahr {year} gefunden."}
-
-        revenue = match.get("revenue")
-        ebit = match.get("operatingIncome")
-        net_income = match.get("netIncome")
-        fcf_url = f"https://financialmodelingprep.com/api/v3/cash-flow-statement/{symbol.upper()}?limit=5&apikey=6h6GDJbniaGPJ1X0zZPeFQXQaMWhojyu"
-        fcf_data = requests.get(fcf_url).json()
-        fcf_match = next((item for item in fcf_data if str(year) in item["date"]), None)
-        free_cash_flow = fcf_match.get("freeCashFlow") if fcf_match else None
-
-        margin = round(net_income / revenue * 100, 2) if revenue and net_income else None
-
-        return {
-            "symbol": symbol.upper(),
-            "year": year,
-            "revenue": revenue,
-            "ebit": ebit,
-            "net_income": net_income,
-            "free_cash_flow": free_cash_flow,
-            "net_margin": margin
-        }
-    except Exception as e:
-        return {"error": str(e)}
