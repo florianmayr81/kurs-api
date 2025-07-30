@@ -10,7 +10,7 @@ def get_fx_rate(to_currency="EUR"):
     try:
         resp = requests.get(fx_url)
         data = resp.json()
-        return data["price"]
+        return data[0]["price"]
     except:
         return 1.0
 
@@ -22,7 +22,7 @@ def get_price(symbol: str, currency: str = "EUR"):
         data = resp.json()
         if not data or "price" not in data[0]:
             return {"error": "Preis nicht gefunden"}
-        price_usd = data["price"]
+        price_usd = data[0]["price"]
         
 # Wechselkurs USD → EUR abrufen (nur wenn currency = EUR)
         if currency.upper() == "EUR":
