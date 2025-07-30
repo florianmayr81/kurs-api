@@ -20,7 +20,7 @@ paths:
           schema:
             type: string
             default: EUR
-          description: Zielwährung (Standard: EUR)
+          description: Zielwährung (z. B. EUR, USD, CHF)
       responses:
         '200':
           description: Kursantwort
