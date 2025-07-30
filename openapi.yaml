@@ -73,3 +73,58 @@ paths:
                   net_margin:
                     type: number
 
+  paths:
+  /analyze:
+    get:
+      operationId: analyzeStock
+      summary: Buffett/Munger Analyse mit DCF und Margin of Safety
+      description: Führt eine Fundamentalanalyse inkl. DCF und Margin of Safety für das angegebene Symbol durch und speichert das Ergebnis automatisch.
+      parameters:
+        - name: symbol
+          in: query
+          required: true
+          description: Das Börsensymbol (z. B. AAPL, NVO)
+          schema:
+            type: string
+        - name: currency
+          in: query
+          required: false
+          description: Zielwährung (z. B. EUR)
+          schema:
+            type: string
+            default: EUR
+      responses:
+        '200':
+          description: Analyse erfolgreich durchgeführt
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  symbol:
+                    type: string
+                  price:
+                    type: number
+                  fair_value:
+                    type: number
+                  mos_price:
+                    type: number
+                  free_cash_flow:
+                    type: number
+                    nullable: true
+                  net_income:
+                    type: number
+                    nullable: true
+                  revenue:
+                    type: number
+                    nullable: true
+                  verdict:
+                    type: string
+                  file_saved:
+                    type: string
+        '400':
+          description: Ungültige Anfrage
+        '500':
+          description: Serverfehler
+
+
