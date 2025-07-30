@@ -1,0 +1,32 @@
+openapi: 3.0.0
+info:
+  title: Kurs-API
+  version: 1.0.0
+servers:
+  - url: https://DEIN-RENDER-ENDPUNKT.onrender.com
+paths:
+  /price:
+    get:
+      summary: Kursdaten in EUR oder gewünschter Währung abrufen
+      parameters:
+        - in: query
+          name: symbol
+          schema: { type: string }
+          required: true
+          description: Börsensymbol, z. B. AAPL, BTCUSD, NESN.SW
+        - in: query
+          name: currency
+          schema: { type: string }
+          required: false
+          description: Zielwährung (z. B. EUR, USD, CHF). Standard: EUR
+      responses:
+        '200':
+          description: Preisantwort in JSON
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  symbol: { type: string }
+                  price: { type: number }
+                  currency: { type: string }
