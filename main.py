@@ -28,7 +28,7 @@ def get_price(symbol: str, currency: str = "EUR"):
         if currency.upper() == "EUR":
             fx_url = f"https://financialmodelingprep.com/api/v3/fx/USD/EUR?apikey={API_KEY}"
             fx_data = requests.get(fx_url).json()
-            fx_rate = fx_data["conversionRate"]
+            fx_rate = fx_data[0]["bid"]
             price = round(price_usd * fx_rate, 2)
         else:
             price = price_usd
