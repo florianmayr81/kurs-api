@@ -17,6 +17,7 @@ def get_fx_rate(to_currency="EUR"):
 @app.get("/price")
 def get_price(symbol: str, currency: str = "EUR"):
     try:
+        # Abruf des USD-Preises der Aktie
         url = f"https://financialmodelingprep.com/api/v3/quote/{symbol.upper()}?apikey={API_KEY}"
         response = requests.get(url)
         data = response.json()
@@ -27,12 +28,18 @@ def get_price(symbol: str, currency: str = "EUR"):
         price_usd = data[0]["price"]
 
         if currency.upper() == "EUR":
+            # Dein funktionierender FX-Endpunkt
             fx_url = f"https://financialmodelingprep.com/stable/quote-short?symbol=EURUSD&apikey={API_KEY}"
-            fx_response = requests.get(fx_url)
-            fx_data = fx_response.json()
+            fx_resp = requests.get(fx_url).json()
 
-            fx_rate = 1 / fx_data[0]["price"]  # USD -> EUR
+            if isinstance(fx_resp, list) and len(fx_resp) > 0 and "price" in fx_resp[0]:
+                eur_usd = fx_resp[0]["price"]
+                fx_rate = round(1 / eur_usd, 6)
+            else:
+                return {"error": "Wechselkurs nicht verfügbar."}
+
             price = round(price_usd * fx_rate, 2)
+
         else:
             price = price_usd
             fx_rate = 1.0
@@ -47,6 +54,7 @@ def get_price(symbol: str, currency: str = "EUR"):
 
     except Exception as e:
         return {"error": str(e)}
+
 
         
 @app.get("/fundamentals")
