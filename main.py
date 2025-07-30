@@ -18,7 +18,7 @@ def get_fx_rate(to_currency="EUR"):
 def get_price(symbol: str, currency: str = "EUR"):
     try:
         url = f"https://financialmodelingprep.com/api/v3/quote/{symbol.upper()},EURUSD?apikey={API_KEY}"
-        response = requests.get(url)
+        response = requests.get(url, headers={"User-Agent": "Mozilla/5.0"})
         data = response.json()
 
         if not data or len(data) < 2:
