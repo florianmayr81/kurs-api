@@ -23,11 +23,23 @@ def get_price(symbol: str, currency: str = "EUR"):
         if not data or "price" not in data[0]:
             return {"error": "Preis nicht gefunden"}
         price_usd = data[0]["price"]
-        fx_rate = get_fx_rate(currency)
+        
+# Wechselkurs USD → EUR abrufen (nur wenn currency = EUR)
+        if currency.upper() == "EUR":
+            fx_url = f"https://financialmodelingprep.com/api/v3/fx/USD/EUR?apikey={API_KEY}"
+            fx_data = requests.get(fx_url).json()
+            fx_rate = fx_data["conversionRate"]
+            price = round(price_usd * fx_rate, 2)
+        else:
+            price = price_usd
+            fx_rate = 1.0
+
         return {
             "symbol": symbol.upper(),
-            "price": round(price_usd * fx_rate, 2),
-            "currency": currency
+            "price": price,
+            "currency": currency.upper(),
+            "converted_from": "USD",
+            "exchange_rate_used": fx_rate
         }
     except Exception as e:
         return {"error": str(e)}
