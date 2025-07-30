@@ -3,7 +3,7 @@ info:
   title: Kurs-API
   version: 1.0.0
 servers:
-  -url: https://kurs-api.onrender.com
+  - url: https://kurs-api.onrender.com
 paths:
   /price:
     get:
