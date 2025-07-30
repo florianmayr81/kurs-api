@@ -22,7 +22,7 @@ def get_price(symbol: str, currency: str = "EUR"):
         data = resp.json()
         if not data or "price" not in data[0]:
             return {"error": "Preis nicht gefunden"}
-        price_usd = data[0]["price"]
+        price_usd = data["price"]
         
 # Wechselkurs USD → EUR abrufen (nur wenn currency = EUR)
         if currency.upper() == "EUR":
