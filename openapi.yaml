@@ -37,3 +37,39 @@ paths:
                     type: number
                   currency:
                     type: string
+  /fundamentals:
+    get:
+      operationId: get_fundamentals
+      summary: Finanzkennzahlen eines Unternehmens für ein bestimmtes Jahr
+      parameters:
+        - in: query
+          name: symbol
+          required: true
+          schema:
+            type: string
+          description: Börsensymbol, z. B. AAPL
+        - in: query
+          name: year
+          required: true
+          schema:
+            type: integer
+          description: Jahr, z. B. 2023
+      responses:
+        '200':
+          description: Fundamentaldaten als JSON
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  revenue:
+                    type: number
+                  ebit:
+                    type: number
+                  net_income:
+                    type: number
+                  free_cash_flow:
+                    type: number
+                  net_margin:
+                    type: number
+
