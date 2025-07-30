@@ -18,18 +18,21 @@ def get_fx_rate(to_currency="EUR"):
 def get_price(symbol: str, currency: str = "EUR"):
     try:
         url = f"https://financialmodelingprep.com/api/v3/quote/{symbol.upper()}?apikey={API_KEY}"
-        resp = requests.get(url)
-        data = resp.json()
-        if not data or "price" not in data[0]:
-            return {"error": "Preis nicht gefunden"}
+        response = requests.get(url)
+        data = response.json()
+
+        if not data:
+            return {"error": "Kein Kurs gefunden."}
+
         price_usd = data[0]["price"]
-        
-# Wechselkurs USD → EUR abrufen (nur wenn currency = EUR)
+
         if currency.upper() == "EUR":
-            fx_url = f"https://financialmodelingprep.com/api/v3/fx/USD/EUR?apikey={API_KEY}"
-            fx_data = requests.get(fx_url).json()
-            fx_rate = fx_data["price"]
-            price = round(price_usd / fx_rate, 2)
+            fx_url = f"https://financialmodelingprep.com/stable/quote-short?symbol=EURUSD&apikey={API_KEY}"
+            fx_response = requests.get(fx_url)
+            fx_data = fx_response.json()
+
+            fx_rate = 1 / fx_data[0]["price"]  # USD -> EUR
+            price = round(price_usd * fx_rate, 2)
         else:
             price = price_usd
             fx_rate = 1.0
@@ -41,8 +44,10 @@ def get_price(symbol: str, currency: str = "EUR"):
             "converted_from": "USD",
             "exchange_rate_used": fx_rate
         }
+
     except Exception as e:
         return {"error": str(e)}
+
         
 @app.get("/fundamentals")
 def get_fundamentals(symbol: str, year: int):
