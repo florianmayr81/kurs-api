@@ -10,7 +10,7 @@ def get_fx_rate(to_currency="EUR"):
     try:
         resp = requests.get(fx_url)
         data = resp.json()
-        return data[0]["bid"]
+        return data["price"]
     except:
         return 1.0
 
