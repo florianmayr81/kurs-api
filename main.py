@@ -35,7 +35,7 @@ def get_price(symbol: str, currency: str = "EUR"):
 @app.get("/fundamentals")
 def get_fundamentals(symbol: str, year: int):
     try:
-        url = f"https://financialmodelingprep.com/api/v3/income-statement/{symbol.upper()}?limit=5&apikey=6h6GDJbniaGPJ1X0zZPeFQXQaMWhojyu"
+        url = f"https://financialmodelingprep.com/api/v3/income-statement/{symbol.upper()}?limit=3&apikey=6h6GDJbniaGPJ1X0zZPeFQXQaMWhojyu"
         resp = requests.get(url)
         data = resp.json()
 
