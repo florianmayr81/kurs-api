@@ -6,7 +6,7 @@ app = FastAPI()
 API_KEY = "6h6GDJbniaGPJ1X0zZPeFQXQaMWhojyu"
 
 def get_fx_rate(to_currency="EUR"):
-    fx_url = f"https://financialmodelingprep.com/api/v3/fx/USD/{to_currency}?apikey={API_KEY}"
+        fx_url = f"https://financialmodelingprep.com/stable/quote-short?symbol=EURUSD&apikey={API_KEY}"
     try:
         resp = requests.get(fx_url)
         data = resp.json()
@@ -28,8 +28,8 @@ def get_price(symbol: str, currency: str = "EUR"):
         if currency.upper() == "EUR":
             fx_url = f"https://financialmodelingprep.com/api/v3/fx/USD/EUR?apikey={API_KEY}"
             fx_data = requests.get(fx_url).json()
-            fx_rate = fx_data[0]["bid"]
-            price = round(price_usd * fx_rate, 2)
+            fx_rate = fx_data["price"]
+            price = round(price_usd / fx_rate, 2)
         else:
             price = price_usd
             fx_rate = 1.0
