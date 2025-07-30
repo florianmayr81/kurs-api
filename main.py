@@ -31,3 +31,37 @@ def get_price(symbol: str, currency: str = "EUR"):
         }
     except Exception as e:
         return {"error": str(e)}
+        
+@app.get("/fundamentals")
+def get_fundamentals(symbol: str, year: int):
+    try:
+        url = f"https://financialmodelingprep.com/api/v3/income-statement/{symbol.upper()}?limit=5&apikey=6h6GDJbniaGPJ1X0zZPeFQXQaMWhojyu"
+        resp = requests.get(url)
+        data = resp.json()
+
+        # Suche nach dem gewünschten Jahr
+        match = next((item for item in data if str(year) in item["date"]), None)
+        if not match:
+            return {"error": f"Kein Bericht für {symbol} im Jahr {year} gefunden."}
+
+        revenue = match.get("revenue")
+        ebit = match.get("operatingIncome")
+        net_income = match.get("netIncome")
+        fcf_url = f"https://financialmodelingprep.com/api/v3/cash-flow-statement/{symbol.upper()}?limit=5&apikey=6h6GDJbniaGPJ1X0zZPeFQXQaMWhojyu"
+        fcf_data = requests.get(fcf_url).json()
+        fcf_match = next((item for item in fcf_data if str(year) in item["date"]), None)
+        free_cash_flow = fcf_match.get("freeCashFlow") if fcf_match else None
+
+        margin = round(net_income / revenue * 100, 2) if revenue and net_income else None
+
+        return {
+            "symbol": symbol.upper(),
+            "year": year,
+            "revenue": revenue,
+            "ebit": ebit,
+            "net_income": net_income,
+            "free_cash_flow": free_cash_flow,
+            "net_margin": margin
+        }
+    except Exception as e:
+        return {"error": str(e)}
